@@ -10,3 +10,5 @@ screenshot.mjs
 serve.mjs
 package.json
 package-lock.json
+misc/
+PRODUCT.md
