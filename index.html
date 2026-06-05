@@ -974,7 +974,18 @@
         <!-- Right: interactive d20 dice -->
         <div class="hero-visual">
             <p class="dice-prompt">Roll the die to know your fate</p>
-            <canvas id="dice-canvas" title="Click to roll the d20" tabindex="0" role="button" aria-label="Roll the d20 die. Press Enter or Space to roll."></canvas>
+            <div style="position:relative;display:inline-block;line-height:0;">
+                <canvas id="dice-canvas" title="Click to roll the d20" tabindex="0" role="button" aria-label="Roll the d20 die. Press Enter or Space to roll."></canvas>
+                <div id="dice-loader" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;transition:opacity .3s ease;">
+                    <p style="font-family:'Cinzel',Georgia,serif;font-size:12px;letter-spacing:.28em;color:#C9A84C;text-transform:uppercase;animation:fade-pulse 2.2s ease-in-out infinite;margin:0 0 12px;">Summoning</p>
+                    <div style="display:flex;align-items:center;justify-content:center;">
+                        <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#7C3AED;margin:0 4px;animation:dot-bounce 1.5s ease-in-out infinite;"></span>
+                        <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#7C3AED;margin:0 4px;animation:dot-bounce 1.5s .25s ease-in-out infinite;"></span>
+                        <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#7C3AED;margin:0 4px;animation:dot-bounce 1.5s .5s ease-in-out infinite;"></span>
+                    </div>
+                    <style>@keyframes fade-pulse{0%,100%{opacity:.5}50%{opacity:1}}</style>
+                </div>
+            </div>
             <div id="dice-result" class="dice-result">
                 <span id="dice-number" class="dice-number"></span>
                 <span id="dice-flavor" class="dice-flavor"></span>
@@ -1183,6 +1194,13 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+function hideDiceLoader() {
+    var l = document.getElementById('dice-loader');
+    if (!l) return;
+    l.style.opacity = '0';
+    setTimeout(function(){ l.remove(); }, 300);
+}
+
 const canvas   = document.getElementById('dice-canvas');
 const SIZE     = 320;
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -1371,12 +1389,14 @@ new GLTFLoader().load(
         dice = gltf;
         dice.updateWorldMatrix(true, true);
         faceData = buildFaceData(dice);
+        hideDiceLoader();
     },
     undefined,
     () => {
         const prompt = canvas.closest('.hero-visual')?.querySelector('.dice-prompt');
         if (prompt) prompt.textContent = 'The die is unavailable. Fate remains unread.';
         canvas.style.display = 'none';
+        hideDiceLoader();
     }
 );
 
@@ -1537,6 +1557,29 @@ animate(0);
         });
     })();
 </script>
+
+<!-- ─── PAGE LOADER — from loader.html ─── -->
+<div id="page-loader" style="
+  position:fixed;inset:0;
+  background:#12141F;
+  display:flex;align-items:center;justify-content:center;
+  z-index:9999;transition:opacity .4s ease;
+">
+  <div style="display:flex;align-items:center;justify-content:center;">
+    <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#7C3AED;margin:0 4px;animation:dot-bounce 1.5s ease-in-out infinite;"></span>
+    <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#7C3AED;margin:0 4px;animation:dot-bounce 1.5s .25s ease-in-out infinite;"></span>
+    <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#7C3AED;margin:0 4px;animation:dot-bounce 1.5s .5s ease-in-out infinite;"></span>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var l = document.getElementById('page-loader');
+    if (!l) return;
+    l.style.opacity = '0';
+    setTimeout(function(){ l.remove(); }, 400);
+  });
+</script>
+<!-- ─────────────────────────────────────── -->
 
 </body>
 </html>
