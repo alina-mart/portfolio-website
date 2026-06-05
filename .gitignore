@@ -1,0 +1,12 @@
+node_modules/
+temporary screenshots/
+*.log
+.DS_Store
+Thumbs.db
+.claude/
+.impeccable/
+CLAUDE_website_v2.md
+screenshot.mjs
+serve.mjs
+package.json
+package-lock.json

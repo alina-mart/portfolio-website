@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Alina Martynchik - Game Scripter</title>
+    <meta name="description" content="Alina Martynchik — Unity gameplay scripter with 5+ years in game production. Shipped 2D games on Yandex Games, hackathon winner, open to full-time and freelance roles.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-base:      #0d0d14;
+            --bg-elevated:  #111120;
+            --bg-card:      #14142a;
+            --accent:       #7c3aed;
+            --accent-light: #9f5cf5;
+            --accent-glow:  rgba(124, 58, 237, 0.25);
+            --text-primary: #ede9f6;
+            --text-muted:   #9d98b8;
+            --border-dim:   rgba(255, 255, 255, 0.06);
+            --border-accent: rgba(124, 58, 237, 0.18);
+            --radius-card:  12px;
+            --radius-btn:   8px;
+            --radius-tag:   999px;
+            --gold:         #C9A84C;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Grain overlay - fixed, pointer-events-none */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+        }
+
+        /* ── Typography helpers ─────────────────────────────── */
+        .display { font-family: 'Cinzel Decorative', serif; }
+
+        /* ── NAV ────────────────────────────────────────────── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 50;
+            height: 68px;
+            background: rgb(13, 13, 20);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-accent);
+        }
+
+        .nav-wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2.25rem;
+        }
+
+        .nav-logo {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: 0.01em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.25rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+
+        .nav-cta {
+            display: inline-block;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            color: #fff !important;
+            text-decoration: none;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            background: var(--accent);
+            padding: 0.4375rem 1.125rem;
+            border-radius: var(--radius-btn);
+            transition: background 0.2s ease, transform 0.15s ease !important;
+        }
+        .nav-cta:hover {
+            background: var(--accent-light) !important;
+            transform: translateY(-1px);
+        }
+        .nav-cta:active { background: var(--accent-light) !important; transform: translateY(0) !important; }
+
+        /* ── HERO BG GRID ───────────────────────────────────── */
+        .hero-bg-grid {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(to right, rgba(124,58,237,0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(124,58,237,0.08) 1px, transparent 1px);
+            background-size: 36px 36px;
+            mask-image: radial-gradient(ellipse at center, black 10%, transparent 72%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 72%);
+        }
+
+        /* ── HERO ────────────────────────────────────────────── */
+        .hero {
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            padding: 68px 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient glow blobs */
+        .hero-glow-a {
+            position: absolute;
+            top: -15%;
+            right: -8%;
+            width: 640px; height: 640px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero-glow-b {
+            position: absolute;
+            bottom: -20%;
+            left: -6%;
+            width: 500px; height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── PROFILE PHOTO ───────────────────────────────────── */
+        .hero-avatar {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .hero-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hero-avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            border: 2px dashed rgba(201,168,76,0.4);
+            border-radius: 50%;
+            background: rgba(201,168,76,0.04);
+            color: rgba(201,168,76,0.55);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            text-align: center;
+            text-transform: uppercase;
+            cursor: default;
+            user-select: none;
+        }
+
+        .hero-avatar-placeholder svg {
+            width: 28px;
+            height: 28px;
+            opacity: 0.5;
+        }
+
+        .hero-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(2.75rem, 5.5vw, 4.25rem);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .hero-sub {
+            font-size: clamp(1rem, 1.6vw, 1.125rem);
+            font-weight: 300;
+            line-height: 1.7;
+            color: var(--text-muted);
+            max-width: 420px;
+            margin-bottom: 0;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 0.875rem;
+            align-items: center;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #fff;
+            background: var(--accent);
+            padding: 0.75rem 1.625rem;
+            border-radius: var(--radius-btn);
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        .btn-primary:hover {
+            background: var(--accent-light);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px var(--accent-glow);
+        }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            background: transparent;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-btn);
+            text-decoration: none;
+            border: 1px solid var(--border-dim);
+            transition: color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+        }
+        .btn-ghost:hover {
+            color: var(--text-primary);
+            border-color: var(--border-accent);
+            transform: translateY(-1px);
+        }
+        .btn-ghost:active { transform: translateY(0); }
+
+        /* Hero visual */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 420px;
+        }
+
+        #dice-canvas {
+            cursor: pointer;
+            display: block;
+        }
+
+        .dice-prompt {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-align: center;
+            letter-spacing: 0.08em;
+        }
+
+        .dice-result {
+            position: absolute;
+            top: calc(50% + 175px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            font-family: 'JetBrains Mono', monospace;
+            color: #C9A84C;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .dice-result.visible { opacity: 1; }
+
+        .dice-number {
+            font-size: 2rem;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        .dice-flavor {
+            font-size: 0.6875rem;
+            opacity: 0.85;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        /* ── SECTION COMMON ──────────────────────────────────── */
+        .section {
+            padding: 7rem 2rem;
+        }
+
+        .section-wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .section-hd {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.625rem, 2.75vw, 2.25rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-desc {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+            max-width: 500px;
+        }
+        .section-desc + .section-desc {margin-top: 1.125rem;}
+
+        /* ── PROJECTS ────────────────────────────────────────── */
+        #projects { background: var(--bg-base); }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.125rem;
+        }
+
+        /* card-featured kept for backwards compat but no longer spans */
+
+        /* Project card */
+        .proj-card {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-card);
+            overflow: visible;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .proj-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-accent);
+            box-shadow: 0 20px 48px rgba(0,0,0,0.45);
+        }
+        .proj-card:active { transform: translateY(-2px); }
+
+        .card-thumb {
+            position: relative;
+            width: 100%;
+            height: 196px;
+            overflow: hidden;
+            border-radius: var(--radius-card) var(--radius-card) 0 0;
+        }
+        .card-thumb img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.45s ease;
+        }
+        .proj-card:hover .card-thumb img { transform: scale(1.05); }
+
+        /* Gradient overlay on image */
+        .card-thumb-shade {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(20,20,42,0.88) 0%, rgba(20,20,42,0.1) 55%, transparent 100%);
+        }
+
+        /* Per-card color treatment - set via inline var */
+        .card-thumb::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--tint, rgba(124,58,237,0.14));
+            mix-blend-mode: multiply;
+        }
+
+        .card-body {
+            padding: 1.125rem 1.375rem 1.375rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.625rem;
+        }
+
+        .card-tag {
+            font-size: 0.625rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent-light);
+            background: rgba(124,58,237,0.12);
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-tag);
+        }
+
+        .card-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 0.9375rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+            flex: 1;
+        }
+
+        .card-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1.125rem;
+            padding-top: 0.875rem;
+            border-top: 1px solid var(--border-dim);
+        }
+
+        .card-engine {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6875rem;
+            color: var(--gold);
+            opacity: 0.8;
+            letter-spacing: 0.02em;
+        }
+
+        .card-arrow {
+            width: 26px; height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: rgba(124,58,237,0.10);
+            color: rgba(160,110,255,0.55);
+            font-size: 0.8125rem;
+            line-height: 1;
+            transition: background 0.25s ease, color 0.25s ease;
+        }
+        .proj-card:hover .card-arrow {
+            background: rgba(124,58,237,0.22);
+            color: rgba(255,255,255,0.55);
+        }
+
+        /* ── SPOTLIGHT GLOW BORDER ──────────────────────────── */
+        /*
+          Technique: border: transparent + two background layers
+          Layer 1 (padding-box) = solid card fill — covers the interior
+          Layer 2 (border-box)  = radial glow — visible only through
+                                   the transparent 1px border strip
+          Coordinates are element-relative (no background-attachment:fixed)
+          so the effect is rock-solid regardless of transforms/scroll.
+        */
+        .proj-card[data-glow] {
+            position: relative;
+            --gx: -9999; --gy: -9999; --gxp: 0;
+            --g-hue:   270;
+            --g-hlive: calc(var(--g-hue) + var(--gxp) * 50);
+            border: 1px solid transparent;
+            background-color: transparent;
+            background-origin: border-box;
+            background-image:
+                radial-gradient(
+                    circle 300px at calc(var(--gx) * 1px) calc(var(--gy) * 1px),
+                    hsl(var(--g-hlive) 100% 70% / 0.06),
+                    transparent
+                ),
+                linear-gradient(var(--bg-card), var(--bg-card)),
+                radial-gradient(
+                    circle 200px at calc(var(--gx) * 1px) calc(var(--gy) * 1px),
+                    hsl(var(--g-hlive) 100% 72% / 1),
+                    transparent 100%
+                );
+            background-clip: padding-box, padding-box, border-box;
+            background-repeat: no-repeat;
+        }
+
+        /* ── ABOUT ───────────────────────────────────────────── */
+        #about {
+            background: var(--bg-elevated);
+            border-top: 1px solid var(--border-accent);
+            border-bottom: 1px solid var(--border-accent);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .about-text {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.75;
+        }
+        .about-text p + p { margin-top: 1.125rem; }
+
+        .skills-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.75rem;
+        }
+
+        .skill-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6875rem;
+            font-weight: 400;
+            color: var(--gold);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            padding: 0.3125rem 0.875rem;
+            border-radius: var(--radius-tag);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: var(--radius-card);
+            padding: 1.375rem 1.5rem;
+        }
+
+        .stat-value {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.375rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* ── CONTACT ─────────────────────────────────────────── */
+        #contact {
+            background: var(--bg-base);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        #contact::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 700px; height: 380px;
+            background: radial-gradient(ellipse, rgba(124,58,237,0.1) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .contact-wrap {
+            max-width: 560px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.875rem 2rem;
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius-card);
+            background: var(--bg-elevated);
+            margin-top: 2.25rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .contact-email:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(124,58,237,0.1);
+            transform: translateY(-2px);
+        }
+        .contact-email:active { transform: translateY(0); }
+
+        .social-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.75rem;
+            margin-top: 2rem;
+        }
+
+        .social-link {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .social-link:hover { color: var(--text-primary); }
+
+        /* ── FOOTER ──────────────────────────────────────────── */
+        footer {
+            padding: 1.375rem 2rem;
+            border-top: 1px solid var(--border-dim);
+        }
+        .footer-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .footer-copy {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        /* ── SCROLL REVEAL ───────────────────────────────────── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Stagger on grid children */
+        .projects-grid .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .projects-grid .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .projects-grid .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .projects-grid .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .projects-grid .reveal:nth-child(5) { transition-delay: 0.33s; }
+
+        /* Hero entrance — matches framer-motion fadeUpVariants:
+           y: 30 → 0, duration: 1s, ease: [0.25, 0.4, 0.25, 1],
+           delay: 0.5 + i * 0.2  (i = 0 title, 1 sub, 2 ctas) */
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-content > * {
+            animation: fade-up 1s cubic-bezier(0.25, 0.4, 0.25, 1) both;
+        }
+        .hero-title        { animation-delay: 0.5s; }
+        .hero-sub          { animation-delay: 0.7s; }
+        .hero-ctas         { animation-delay: 0.9s; }
+
+        .hero-visual {
+            animation: fade-up 1s cubic-bezier(0.25, 0.4, 0.25, 1) 1.1s both;
+        }
+
+        /* ── HAMBURGER BUTTON ────────────────────────────────── */
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            transition: background 0.15s ease;
+        }
+        .nav-hamburger:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .nav-hamburger span {
+            display: block;
+            height: 2px;
+            background: var(--text-muted);
+            border-radius: 2px;
+            transform-origin: center;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity   0.18s ease,
+                        background 0.15s ease;
+        }
+        .nav-hamburger:hover span { background: var(--text-primary); }
+
+        /* Bars morph to × when menu is open */
+        #site-nav.nav-open .nav-hamburger span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        #site-nav.nav-open .nav-hamburger span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        #site-nav.nav-open .nav-hamburger span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* ── MOBILE MENU PANEL ───────────────────────────────── */
+        .nav-mobile-menu {
+            display: none;
+            position: fixed;
+            top: 68px;
+            left: 0;
+            right: 0;
+            flex-direction: column;
+            background: rgba(13, 13, 20, 0.97);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-accent);
+            padding: 0.375rem 0 0.625rem;
+            z-index: 49;
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity 0.2s ease,
+                        transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #site-nav.nav-open .nav-mobile-menu {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .nav-mobile-link {
+            display: block;
+            padding: 0.9rem 2rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9375rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-dim);
+            transition: color 0.15s ease, background 0.15s ease;
+        }
+        .nav-mobile-link:last-child { border-bottom: none; }
+        .nav-mobile-link:hover {
+            color: var(--text-primary);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        /* ── RESPONSIVE ──────────────────────────────────────── */
+        @media (max-width: 768px) {
+            /* Nav */
+            .nav-right { gap: 1rem; }
+            .nav-hamburger { display: flex; }
+            .nav-mobile-menu { display: flex; }
+            .nav-links { display: none; }
+
+            /* Hero layout */
+            .hero-inner {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .hero-sub { max-width: 100%; }
+
+            /* Shrink avatar so the hero doesn't get too tall */
+            .hero-avatar {
+                width: 120px;
+                height: 120px;
+            }
+
+            /* Restore dice — scale it down instead of hiding */
+            .hero-visual {
+                min-height: 300px;
+                gap: 0.25rem;
+            }
+            #dice-canvas {
+                width: 220px !important;
+                height: 220px !important;
+            }
+            /* Flow result below canvas on mobile (avoids overflow:hidden clipping) */
+            .dice-result {
+                position: static;
+                transform: none;
+                top: auto;
+                left: auto;
+                width: 220px;
+                margin-top: 0.5rem;
+            }
+
+            /* Sections */
+            .projects-grid { grid-template-columns: 1fr; }
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+            .section { padding: 5rem 1.25rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-content > *, .hero-visual {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+            .nav-hamburger span,
+            .nav-mobile-menu {
+                transition: none;
+            }
+        }
+
+        /* ── FOCUS-VISIBLE ───────────────────────────────────── */
+        :focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        /* Nav CTA has purple bg — white outline reads better */
+        .nav-cta:focus-visible {
+            outline-color: rgba(255, 255, 255, 0.85);
+        }
+        /* Btn-primary same reason */
+        .btn-primary:focus-visible {
+            outline-color: rgba(255, 255, 255, 0.85);
+        }
+        /* Contact email block: use accent ring + glow for cohesion */
+        .contact-email:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 4px;
+            box-shadow: 0 0 0 5px rgba(124, 58, 237, 0.15);
+        }
+        /* Canvas (dice) */
+        #dice-canvas:focus-visible {
+            outline: 2px solid var(--accent-light);
+            outline-offset: 6px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────────────────── -->
+<nav id="site-nav">
+    <div class="nav-wrap">
+        <a href="#" class="nav-logo">Alina Martynchik</a>
+        <div class="nav-right">
+            <ul class="nav-links">
+                <li><a href="#projects">Unity Projects</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+            <button class="nav-hamburger" id="nav-hamburger"
+                    aria-label="Open navigation menu"
+                    aria-expanded="false"
+                    aria-controls="nav-mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="#contact" class="nav-cta">Get in Touch</a>
+        </div>
+    </div>
+    <div class="nav-mobile-menu" id="nav-mobile-menu" aria-hidden="true">
+        <a href="#projects" class="nav-mobile-link">Unity Projects</a>
+        <a href="#about" class="nav-mobile-link">About</a>
+    </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────── -->
+<section class="hero" id="home">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-glow-a"></div>
+    <div class="hero-glow-b"></div>
+
+    <div class="hero-inner">
+        <!-- Left: copy -->
+        <div class="hero-content">
+            <!-- Replace .hero-avatar-placeholder with an <img> tag when ready -->
+            <div class="hero-avatar">
+                <img src="profile_picture_cropped_2.png" alt="Alina Martynchik">
+            </div>
+            <h1 class="hero-title display">Alina Martynchik</h1>
+            <p class="hero-sub">Game industry professional with hands-on experience in Unity 2D, gameplay scripting, game jam projects, and production workflow automation.</p>
+            <div class="skills-row reveal" style="margin-top: 1.5rem; margin-bottom: 2.25rem;">
+                <span class="skill-pill">Unity</span>
+                <span class="skill-pill">JavaScript</span>
+                <span class="skill-pill">Google Apps Script</span>
+                <span class="skill-pill">Workflow automation</span>
+                <span class="skill-pill">Localization QA</span>
+                <span class="skill-pill">GitHub</span>
+                <span class="skill-pill">AI-assisted development</span>
+                <span class="skill-pill">C# basics</span>
+                <span class="skill-pill">Blender basics</span>
+            </div>
+            <div class="hero-ctas">
+                <a href="#projects" class="btn-primary">View Projects</a>
+                <a href="#about" class="btn-ghost">About me</a>
+            </div>
+        </div>
+
+        <!-- Right: interactive d20 dice -->
+        <div class="hero-visual">
+            <p class="dice-prompt">Roll the die to know your fate</p>
+            <canvas id="dice-canvas" title="Click to roll the d20" tabindex="0" role="button" aria-label="Roll the d20 die. Press Enter or Space to roll."></canvas>
+            <div id="dice-result" class="dice-result">
+                <span id="dice-number" class="dice-number"></span>
+                <span id="dice-flavor" class="dice-flavor"></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── PROJECTS ─────────────────────────────────────────────── -->
+<section class="section" id="projects">
+    <div class="section-wrap">
+        <div class="section-hd reveal">
+            <h2 class="section-title">Unity Projects</h2>
+            <p class="section-desc">Four Unity projects built solo, in a team, and in game jams. The code in C# is written with the help of AI tools, Youtube tutorials, and my own research.</p>
+            <p class="section-desc">Click any project to explore it in full.</p>
+        </div>
+
+        <div class="projects-grid">
+
+            <!-- 01 - Featured: Crazy Office Runner -->
+            <a href="project-crazy-office-runner.html" class="proj-card card-featured reveal" data-glow style="--tint: rgba(60,20,160,0.22)">
+                <div class="card-thumb">
+                    <img src="projects_previews/yandex_runner_cover.png" alt="Crazy Office Runner" loading="lazy">
+                    <div class="card-thumb-shade"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tags">
+                        <span class="card-tag">WebGL</span>
+                        <span class="card-tag">Mobile</span>
+                        <span class="card-tag">Spine animations</span>
+                        <span class="card-tag">Yandex Games</span>
+                        <span class="card-tag">Gameplay scripting</span>
+                    </div>
+                    <div class="card-title">Crazy Office Runner</div>
+                    <p class="card-desc">2D endless runner for Yandex Games. An office worker snaps, jumps on a chair, and rides through workplace chaos. Core gameplay complete, nearing release.</p>
+                    <div class="card-foot">
+                        <span class="card-engine">Unity 2D · 2026</span>
+                        <span class="card-arrow">↗</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 02: Snake Runner -->
+            <a href="project-snake-runner.html" class="proj-card reveal" data-glow style="--tint: rgba(20,120,60,0.18)">
+                <div class="card-thumb">
+                    <img src="projects_previews/snake_runner_cover.png" alt="Snake Runner" loading="lazy">
+                    <div class="card-thumb-shade"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tags">
+                        <span class="card-tag">WebGL</span>
+                        <span class="card-tag">Hackathon</span>
+                        <span class="card-tag">1st Place</span>
+                        <span class="card-tag">Public Release</span>
+                    </div>
+                    <div class="card-title">Snake Runner for Vikings: War of Clans</div>
+                    <p class="card-desc">2D runner mini-game built in a 48-hour hackathon. Won 1st place and later released in the Vikings: War of Clans community for real players.</p>
+                    <div class="card-foot">
+                        <span class="card-engine">Unity 2D · 2025</span>
+                        <span class="card-arrow">↗</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 03: The Mystery of the Lost Plot -->
+            <a href="project-mystery-lost-plot.html" class="proj-card reveal" data-glow style="--tint: rgba(80,30,200,0.18)">
+                <div class="card-thumb">
+                    <img src="projects_previews/mystery_lost_plot_cover.png" alt="The Mystery of the Lost Plot" loading="lazy">
+                    <div class="card-thumb-shade"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tags">
+                        <span class="card-tag">PC</span>
+                        <span class="card-tag">Puzzle/Platformer</span>
+                        <span class="card-tag">Narrative design</span>
+                        <span class="card-tag">Dialogue sequences</span>
+                        <span class="card-tag">Story-driven</span>
+                        <span class="card-tag">Gameplay scripting</span>
+                        <span class="card-tag">Game Jam</span>
+                    </div>
+                    <div class="card-title">The Mystery of the Lost Plot</div>
+                    <p class="card-desc">Sketch-style 2D puzzle-platformer prototype built in a game jam. A hero restores a broken literary world by solving puzzles and breathing life into forgotten ideas.</p>
+                    <div class="card-foot">
+                        <span class="card-engine">Unity 2D · 2025</span>
+                        <span class="card-arrow">↗</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 04: Adventures of Loperecopik -->
+            <a href="project-loperecopik.html" class="proj-card reveal" data-glow style="--tint: rgba(50,15,130,0.2)">
+                <div class="card-thumb">
+                    <img src="projects_previews/adventures_of_loperecopik_cover.png" alt="Adventures of Loperecopik" loading="lazy">
+                    <div class="card-thumb-shade"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-tags">
+                        <span class="card-tag">PC</span>
+                        <span class="card-tag">Platformer</span>
+                        <span class="card-tag">Solo</span>
+                        <span class="card-tag">Gameplay scripting</span>         
+                    </div>
+                    <div class="card-title">Adventures of Loperecopik</div>
+                    <p class="card-desc">A solo-built 2D platformer made in one month as a heartfelt New Year gift for the team, packed with department in-jokes and shared memories.</p>
+                    <div class="card-foot">
+                        <span class="card-engine">Unity 2D · 2024</span>
+                        <span class="card-arrow">↗</span>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</section>
+
+<!-- ── ABOUT ─────────────────────────────────────────────────── -->
+<section class="section" id="about">
+    <div class="section-wrap">
+        <div class="about-grid">
+            <!-- Left -->
+            <div>
+                <h2 class="section-title reveal">About</h2>
+                <div class="about-text reveal">
+                    <p>I have spent the last 5+ years in the game industry working in localization and workflow automation. Somewhere along the way, solving workflow problems pulled me deeper into the technical side of development. What started with spreadsheet formulas turned into JavaScript and Google Apps Script tools for automating internal production pipelines in gamedev.</p>
+                    <p>But outside of my day job, I kept drifting toward making games myself. I have built 4 Unity projects through game jams, a hackathon, and I am currently developing an endless runner for Yandex Games with my friend.</p>
+                    <p>I am especially drawn to RPGs, souls-like games, interactive storytelling, and games where player choices actually mean something. Gameplay scripting feels like the natural next step.</p>
+                </div>
+                <div class="skills-row reveal">
+                    <span class="skill-pill">Unity</span>
+                    <span class="skill-pill">JavaScript</span>
+                    <span class="skill-pill">Google Apps Script</span>
+                    <span class="skill-pill">Workflow automation</span>
+                    <span class="skill-pill">Localization QA</span>
+                    <span class="skill-pill">GitHub</span>
+                    <span class="skill-pill">AI-assisted development</span>
+                    <span class="skill-pill">C# basics</span>
+                    <span class="skill-pill">Blender basics</span>
+                </div>
+            </div>
+
+            <!-- Right: stats -->
+            <div class="stats-grid reveal">
+                <div class="stat-card">
+                    <div class="stat-value">5+</div>
+                    <div class="stat-label">Years in game industry</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Unity 2D projects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">Official event release</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">1</div>
+                    <div class="stat-label">Hackathon victory</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── CONTACT ───────────────────────────────────────────────── -->
+<section class="section" id="contact">
+    <div class="section-wrap contact-wrap">
+        <h2 class="section-title reveal" style="font-size: clamp(2rem, 4vw, 2.875rem);">Let's Start a New Quest Together</h2>
+        <p class="section-desc reveal" style="margin: 0.75rem auto 0; text-align: center; max-width: 400px;">Open to freelance projects and full-time roles.</p>
+        <div class="reveal">
+            <a href="mailto:a.martynchik95@gmail.com" class="contact-email">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    style="color: var(--accent-light); flex-shrink:0">
+                    <rect width="20" height="16" x="2" y="4" rx="2"/>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                a.martynchik95@gmail.com
+            </a>
+        </div>
+        <div class="social-row reveal">
+            <a href="https://github.com/alina-mart" class="social-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://www.linkedin.com/in/alina-martynchik/" class="social-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        </div>
+    </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────── -->
+<footer>
+    <div class="footer-inner">
+        <span class="footer-copy">Alina Martynchik, 2026</span>
+        <span class="footer-copy">Game Scripter</span>
+    </div>
+</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const canvas   = document.getElementById('dice-canvas');
+const SIZE     = 320;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(SIZE, SIZE);
+renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.5;
+canvas.style.width  = SIZE + 'px';
+canvas.style.height = SIZE + 'px';
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+camera.position.z = 5.5;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+
+const keyLight = new THREE.DirectionalLight(0xffe4a0, 3.0);
+keyLight.position.set(3, 6, 4);
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x7c3aed, 1.5);
+fillLight.position.set(-4, -1, 3);
+scene.add(fillLight);
+
+const rimLight = new THREE.PointLight(0xc9a84c, 2.0, 14);
+rimLight.position.set(-1, 4, -4);
+scene.add(rimLight);
+
+const faceTexts = {
+    1:  'Critical failure. The dungeon laughs. But you know what they say — a fall into a pit, a gain in your wit.',
+    2:  'Crying is a free action. But better roll again.',
+    3:  'The die is not on your side. But where there\'s a will, there\'s a way.',
+    4:  'Not the best start, but remember — a smooth sea never made a skilled sailor.',
+    5:  'The omen is unclear, and frankly, a little rude.',
+    6:  'The cake is still a lie.',
+    7:  'Not all signs are clear. Some require another roll.',
+    8:  'Meh. The die refuses to elaborate.',
+    9:  'The stars are silent, but not uninterested.',
+    10: 'Halfway between disaster and glory — a surprisingly crowded place.',
+    11: 'A door appears. Whether it opens is another question.',
+    12: 'The die approves your next move.',
+    13: 'The odds look impressed. Try to act natural.',
+    14: 'The boss music is still quiet. Promising.',
+    15: 'The Companion Die seems excited for the opportunities ahead. At least, that little shine on the edge... counts as proof, right?',
+    16: 'A strong omen appears. It looks employable.',
+    17: 'A promising roll. Even Gwent can\'t distract luck from turning in your favor.',
+    18: 'Opportunity seldom knocks twice. Open the door!',
+    19: 'They say it\'s dangerous to go alone — but honestly, you look suspiciously prepared.',
+    20: 'NATURAL 20. Rome wasn\'t built in a day. But if YOU were on the team, it might have been!',
+};
+
+const numEl    = document.getElementById('dice-number');
+const flavorEl = document.getElementById('dice-flavor');
+const resultEl = document.getElementById('dice-result');
+
+let dice         = null;
+let isRolling    = false;
+let rollProg     = 0;
+const ROLL_DUR   = 2.2;
+const rollStart  = new THREE.Euler();
+const rollEnd    = new THREE.Euler();
+let floatT       = 0;
+let prevTime     = 0;
+let targetNumber = null;
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Each entry: { normal: THREE.Vector3 (in dice local space), number: 1-20 }
+let faceData = [];
+
+// Build a mapping of face normals → face numbers from the loaded geometry.
+// Strategy 1: find "Text_N" (or bare "N") child objects — their world positions
+//             relative to the dice center give the exact face normals.
+// Strategy 2: compute face normals from icosahedron triangle geometry.
+function buildFaceData(root) {
+    const result = [];
+    root.updateWorldMatrix(true, true);
+
+    const box    = new THREE.Box3().setFromObject(root);
+    const center = box.getCenter(new THREE.Vector3());
+
+    // Match "Text_3", "text_20", or plain "7" etc.
+    const numFromName = name => {
+        const m = name.match(/^[Tt]ext_(\d+)$/) || name.match(/^(\d+)$/);
+        if (!m) return NaN;
+        return parseInt(m[1], 10);
+    };
+
+    root.traverse(child => {
+        const n = numFromName(child.name);
+        if (isNaN(n) || n < 1 || n > 20) return;
+        child.updateWorldMatrix(true, false);
+        const worldPos = new THREE.Vector3();
+        child.getWorldPosition(worldPos);
+        const dir = worldPos.clone().sub(center);
+        if (dir.lengthSq() < 1e-6) return;
+        result.push({ normal: dir.normalize(), number: n });
+    });
+
+    // Deduplicate — traverse visits every node so a group + its child mesh
+    // can both match, causing the same number to appear twice in the array.
+    const seen = new Set();
+    const deduped = result.filter(f => {
+        if (seen.has(f.number)) return false;
+        seen.add(f.number);
+        return true;
+    });
+
+    if (deduped.length === 20) {
+        return deduped;
+    }
+    result.length = 0;
+
+    // Find the icosahedron body mesh (prefer the one named with "face" or "bod",
+    // otherwise the mesh with the most vertices).
+    let mainMesh = null, maxV = 0;
+    root.traverse(c => {
+        if (!c.isMesh) return;
+        const v = c.geometry.attributes.position?.count ?? 0;
+        const preferred = /face|bod|ico/i.test(c.name);
+        if (preferred || v > maxV) { maxV = v; mainMesh = c; }
+    });
+    if (!mainMesh) { return []; }
+
+    mainMesh.updateWorldMatrix(true, false);
+    const posAttr = mainMesh.geometry.getAttribute('position');
+    const idxAttr = mainMesh.geometry.index;
+    const matNorm = new THREE.Matrix3().getNormalMatrix(mainMesh.matrixWorld);
+    const triCount = idxAttr ? idxAttr.count / 3 : posAttr.count / 3;
+
+    // Compute per-triangle normals from vertex positions
+    const raw = [];
+    for (let i = 0; i < triCount; i++) {
+        const ia = idxAttr ? idxAttr.getX(i*3)   : i*3;
+        const ib = idxAttr ? idxAttr.getX(i*3+1) : i*3+1;
+        const ic = idxAttr ? idxAttr.getX(i*3+2) : i*3+2;
+        const a = new THREE.Vector3().fromBufferAttribute(posAttr, ia);
+        const b = new THREE.Vector3().fromBufferAttribute(posAttr, ib);
+        const c2 = new THREE.Vector3().fromBufferAttribute(posAttr, ic);
+        const n = new THREE.Vector3().crossVectors(b.clone().sub(a), c2.clone().sub(a));
+        if (n.lengthSq() < 1e-10) continue;
+        raw.push(n.applyMatrix3(matNorm).normalize());
+    }
+
+    // Cluster into ≤20 unique face directions
+    const unique = [];
+    for (const n of raw) {
+        if (!unique.some(u => u.dot(n) > 0.97)) unique.push(n.clone());
+    }
+
+    unique.sort((a, b) => {
+        if (Math.abs(a.y - b.y) > 0.01) return b.y - a.y;
+        return Math.atan2(a.z, a.x) - Math.atan2(b.z, b.x);
+    });
+    for (let i = 0; i < Math.min(unique.length, 20); i++) {
+        result.push({ normal: unique[i], number: i + 1 });
+    }
+    return result;
+}
+
+// Return the Euler rotation that places faceNormal pointing straight at the camera.
+function targetEulerFor(faceNormal) {
+    const toward = new THREE.Vector3(0, 0, 1); // camera is at z=5.5 → toward = +Z
+    const n = faceNormal.clone().normalize();
+    if (n.dot(toward) < -0.999) return new THREE.Euler(Math.PI, 0, 0);
+    return new THREE.Euler().setFromQuaternion(
+        new THREE.Quaternion().setFromUnitVectors(n, toward)
+    );
+}
+
+// How many extra radians (0–2π) to add to `from` to reach `to` going forward.
+function angleDelta(from, to) {
+    const norm = ((from % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+    return ((to - norm) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+}
+
+new GLTFLoader().load(
+    'brand_assets/gothic_d20_website.glb',
+    ({ scene: gltf }) => {
+        const box    = new THREE.Box3().setFromObject(gltf);
+        const center = box.getCenter(new THREE.Vector3());
+        const size   = box.getSize(new THREE.Vector3());
+        gltf.position.sub(center);
+        gltf.scale.setScalar(2.4 / Math.max(size.x, size.y, size.z));
+        scene.add(gltf);
+        dice = gltf;
+        dice.updateWorldMatrix(true, true);
+        faceData = buildFaceData(dice);
+    },
+    undefined,
+    () => {
+        const prompt = canvas.closest('.hero-visual')?.querySelector('.dice-prompt');
+        if (prompt) prompt.textContent = 'The die is unavailable. Fate remains unread.';
+        canvas.style.display = 'none';
+    }
+);
+
+function doRoll() {
+    if (!dice || isRolling) return;
+    resultEl.classList.remove('visible');
+    rollStart.copy(dice.rotation);
+
+    // Pick the target number first (shared by both paths)
+    let chosenFace = null;
+    if (faceData.length > 0) {
+        chosenFace   = faceData[Math.floor(Math.random() * faceData.length)];
+        targetNumber = chosenFace.number;
+    } else {
+        targetNumber = Math.floor(Math.random() * 20) + 1;
+    }
+
+    // Reduced-motion path: show result instantly, no spin
+    if (prefersReducedMotion) {
+        numEl.textContent    = targetNumber;
+        flavorEl.textContent = faceTexts[targetNumber];
+        resultEl.classList.add('visible');
+        targetNumber = null;
+        return;
+    }
+
+    // Animated path
+    isRolling = true;
+    rollProg  = 0;
+    if (chosenFace) {
+        const te = targetEulerFor(chosenFace.normal);
+        // Spin counts MUST be integers so extra rotations are exact multiples of 2π
+        const sx = Math.PI * 2 * (6 + Math.floor(Math.random() * 4));
+        const sy = Math.PI * 2 * (6 + Math.floor(Math.random() * 4));
+        const sz = Math.PI * 2 * (2 + Math.floor(Math.random() * 3));
+        rollEnd.set(
+            rollStart.x + sx + angleDelta(rollStart.x, te.x),
+            rollStart.y + sy + angleDelta(rollStart.y, te.y),
+            rollStart.z + sz + angleDelta(rollStart.z, te.z)
+        );
+    } else {
+        rollEnd.set(
+            rollStart.x + Math.PI * 2 * (5 + Math.random() * 5),
+            rollStart.y + Math.PI * 2 * (5 + Math.random() * 5),
+            rollStart.z + Math.PI * 2 * (2 + Math.random() * 3)
+        );
+    }
+}
+
+canvas.addEventListener('click', doRoll);
+canvas.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doRoll(); }
+});
+
+function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+
+function animate(ts) {
+    requestAnimationFrame(animate);
+    if (prevTime === 0) { prevTime = ts; }
+    const dt = Math.min((ts - prevTime) / 1000, 0.05);
+    prevTime = ts;
+    if (!dice) return;
+
+    if (isRolling) {
+        rollProg = Math.min(rollProg + dt / ROLL_DUR, 1);
+        const e  = easeOutQuart(rollProg);
+        dice.rotation.x = rollStart.x + (rollEnd.x - rollStart.x) * e;
+        dice.rotation.y = rollStart.y + (rollEnd.y - rollStart.y) * e;
+        dice.rotation.z = rollStart.z + (rollEnd.z - rollStart.z) * e;
+        if (rollProg === 1) {
+            isRolling = false;
+            numEl.textContent    = targetNumber;
+            flavorEl.textContent = faceTexts[targetNumber];
+            resultEl.classList.add('visible');
+            targetNumber = null;
+        }
+    } else if (!prefersReducedMotion) {
+        floatT          += dt;
+        dice.position.y  = Math.sin(floatT * 0.8) * 0.09;
+        dice.rotation.y += dt * 0.22;
+    }
+
+    renderer.render(scene, camera);
+}
+animate(0);
+</script>
+
+<script>
+    // Spotlight glow: sync element-relative pointer position → CSS vars
+    (function () {
+        const glowCards = document.querySelectorAll('.proj-card[data-glow]');
+        if (!glowCards.length) return;
+        document.addEventListener('pointermove', function (e) {
+            var cx = e.clientX;
+            var cy = e.clientY;
+            glowCards.forEach(function (card) {
+                var r  = card.getBoundingClientRect();
+                var gx = cx - r.left;
+                var gy = cy - r.top;
+                card.style.setProperty('--gx',  gx.toFixed(1));
+                card.style.setProperty('--gy',  gy.toFixed(1));
+                card.style.setProperty('--gxp', (gx / r.width).toFixed(3));
+            });
+        });
+        document.addEventListener('pointerleave', function () {
+            glowCards.forEach(function (card) {
+                card.style.setProperty('--gx', -9999);
+                card.style.setProperty('--gy', -9999);
+            });
+        });
+    })();
+
+    // Scroll reveal via IntersectionObserver
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                io.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+
+    // Mobile nav toggle
+    (function () {
+        const nav = document.getElementById('site-nav');
+        const btn = document.getElementById('nav-hamburger');
+        const menu = document.getElementById('nav-mobile-menu');
+        if (!nav || !btn || !menu) return;
+
+        function openMenu() {
+            nav.classList.add('nav-open');
+            btn.setAttribute('aria-expanded', 'true');
+            menu.setAttribute('aria-hidden', 'false');
+        }
+        function closeMenu() {
+            nav.classList.remove('nav-open');
+            btn.setAttribute('aria-expanded', 'false');
+            menu.setAttribute('aria-hidden', 'true');
+        }
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            nav.classList.contains('nav-open') ? closeMenu() : openMenu();
+        });
+
+        menu.querySelectorAll('.nav-mobile-link').forEach(function (link) {
+            link.addEventListener('click', closeMenu);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!nav.contains(e.target)) closeMenu();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeMenu();
+        });
+    })();
+</script>
+
+</body>
+</html>

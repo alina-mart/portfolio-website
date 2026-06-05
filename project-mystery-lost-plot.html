@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>The Mystery of the Lost Plot - Unity Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-base:      #0d0d14;
+            --bg-elevated:  #111120;
+            --bg-card:      #14142a;
+            --accent:       #7c3aed;
+            --accent-light: #9f5cf5;
+            --accent-glow:  rgba(124, 58, 237, 0.25);
+            --text-primary: #ede9f6;
+            --text-muted:   #9994ab;
+            --border-dim:   rgba(255, 255, 255, 0.06);
+            --border-accent: rgba(124, 58, 237, 0.18);
+            --radius-card:  12px;
+            --radius-btn:   8px;
+            --radius-tag:   999px;
+            --gold:         #C9A84C;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+        }
+
+        .display { font-family: 'Cinzel Decorative', serif; }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 50;
+            height: 68px;
+            background: rgb(13, 13, 20);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-accent);
+        }
+
+        .nav-wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2.25rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.25rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.9rem;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+
+        .nav-cta {
+            display: inline-block;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            color: #fff !important;
+            text-decoration: none;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            background: var(--accent);
+            padding: 0.4375rem 1.125rem;
+            border-radius: var(--radius-btn);
+            transition: background 0.2s ease, transform 0.15s ease !important;
+        }
+        .nav-cta:hover { background: var(--accent-light) !important; transform: translateY(-1px); }
+        .nav-cta:active { background: var(--accent-light) !important; transform: translateY(0) !important; }
+        .nav-cta:focus-visible { outline-color: rgba(255, 255, 255, 0.85); }
+
+        /* ── HAMBURGER BUTTON ── */
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            transition: background 0.15s ease;
+        }
+        .nav-hamburger:hover { background: rgba(255, 255, 255, 0.05); }
+        .nav-hamburger span {
+            display: block;
+            height: 2px;
+            background: var(--text-muted);
+            border-radius: 2px;
+            transform-origin: center;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity   0.18s ease,
+                        background 0.15s ease;
+        }
+        .nav-hamburger:hover span { background: var(--text-primary); }
+        nav.nav-open .nav-hamburger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        nav.nav-open .nav-hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        nav.nav-open .nav-hamburger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* ── MOBILE MENU PANEL ── */
+        .nav-mobile-menu {
+            display: none;
+            position: fixed;
+            top: 68px; left: 0; right: 0;
+            flex-direction: column;
+            background: rgba(13, 13, 20, 0.97);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-accent);
+            padding: 0.375rem 0 0.625rem;
+            z-index: 49;
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity 0.2s ease,
+                        transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        nav.nav-open .nav-mobile-menu {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .nav-mobile-link {
+            display: block;
+            padding: 0.9rem 2rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9375rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-dim);
+            transition: color 0.15s ease, background 0.15s ease;
+        }
+        .nav-mobile-link:last-child { border-bottom: none; }
+        .nav-mobile-link:hover { color: var(--text-primary); background: rgba(124, 58, 237, 0.05); }
+
+        .project-hero {
+            padding: calc(68px + 5rem) 2rem 5rem;
+            background: var(--bg-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-hero::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            right: -8%;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .project-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -5%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(100,30,220,0.08) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .project-hero-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4.5rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .back-link:hover { color: var(--text-primary); transform: translateX(-3px); }
+
+        .project-year {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6875rem;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.875rem;
+        }
+
+        .project-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .project-brief {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            max-width: 480px;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-tag {
+            font-size: 0.625rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent-light);
+            background: rgba(124,58,237,0.12);
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-tag);
+        }
+
+        .project-meta-row {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border-dim);
+        }
+
+        .meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
+
+        .meta-label {
+            font-size: 0.625rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0.55;
+        }
+
+        .meta-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .project-hero-image {
+            position: relative;
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            aspect-ratio: 16/10;
+            border: 1px solid var(--border-dim);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+        }
+
+        .project-hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .project-hero-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(13,13,20,0.5) 0%, transparent 60%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .project-hero-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(80,30,200,0.1);
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+
+        .section { padding: 6rem 2rem; }
+        .section-wrap { max-width: 1180px; margin: 0 auto; }
+
+        .section-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 2.25rem;
+        }
+
+        #media {
+            background: var(--bg-elevated);
+            border-top: 1px solid var(--border-accent);
+            border-bottom: 1px solid var(--border-accent);
+        }
+
+        .media-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6875rem;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.625rem;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: var(--bg-card);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            border: 1px solid var(--border-dim);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .slides-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 61.73%;
+            background: var(--bg-card);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            border: 1px solid var(--border-dim);
+        }
+
+        .slides-wrapper iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .media-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+        .media-block:last-child { margin-bottom: 0; }
+
+        #context { background: var(--bg-base); }
+
+        .context-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 5rem;
+            align-items: start;
+        }
+
+        .context-side-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6875rem;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .context-heading {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.0625rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.45;
+        }
+
+        .context-text {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.75;
+        }
+        .context-text p + p { margin-top: 1rem; }
+
+        .notice-text {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-left: 2px solid rgba(124,58,237,0.3);
+            background: rgba(124,58,237,0.05);
+            border-radius: 0 6px 6px 0;
+        }
+
+        #contribution {
+            background: var(--bg-elevated);
+            border-top: 1px solid var(--border-accent);
+        }
+
+        .contribution-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+            list-style: none;
+            max-width: 760px;
+        }
+
+        .contribution-list li {
+            position: relative;
+            padding-left: 1.75rem;
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .contribution-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.6em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.75;
+        }
+
+        .project-nav-section {
+            padding: 3rem 2rem;
+            background: var(--bg-base);
+            border-top: 1px solid var(--border-dim);
+        }
+
+        .project-nav-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            background: transparent;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-btn);
+            text-decoration: none;
+            border: 1px solid var(--border-dim);
+            transition: color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+        }
+        .btn-ghost:hover { color: var(--text-primary); border-color: var(--border-accent); transform: translateY(-1px); }
+
+        footer {
+            padding: 1.375rem 2rem;
+            border-top: 1px solid var(--border-dim);
+        }
+        .footer-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .footer-copy { font-size: 0.75rem; color: var(--text-muted); opacity: 0.5; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .project-hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+            .project-hero-image { order: -1; }
+            .context-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .nav-links { display: none; }
+            .nav-hamburger { display: flex; }
+            .nav-mobile-menu { display: flex; }
+            .nav-right { gap: 1rem; }
+            .section { padding: 4rem 1.25rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+        }
+
+        .hero-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.625rem;
+            margin-top: 1.25rem;
+        }
+
+        .btn-context {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--accent-light);
+            background: rgba(124,58,237,0.08);
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius-btn);
+            text-decoration: none;
+            border: 1px solid var(--border-accent);
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+        }
+        .btn-context:hover {
+            background: rgba(124,58,237,0.15);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        #media, #creative-context, #contribution {
+            scroll-margin-top: 88px;
+        }
+    </style>
+</head>
+<body>
+
+<nav id="site-nav">
+    <div class="nav-wrap">
+        <a href="index.html" class="nav-logo display">Alina Martynchik</a>
+        <div class="nav-right">
+            <ul class="nav-links">
+                <li><a href="index.html#projects">Unity Projects</a></li>
+                <li><a href="index.html#about">About</a></li>
+            </ul>
+            <button class="nav-hamburger" id="nav-hamburger"
+                    aria-label="Open navigation menu"
+                    aria-expanded="false"
+                    aria-controls="nav-mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="index.html#contact" class="nav-cta">Get in Touch</a>
+        </div>
+    </div>
+    <div class="nav-mobile-menu" id="nav-mobile-menu" aria-hidden="true">
+        <a href="index.html#projects" class="nav-mobile-link">Unity Projects</a>
+        <a href="index.html#about" class="nav-mobile-link">About</a>
+    </div>
+</nav>
+
+<section class="project-hero">
+    <div class="project-hero-inner">
+
+        <div>
+            <a href="index.html#projects" class="back-link">&#8592; Back to Projects</a>
+            <p class="project-year">2025 &middot; Game Jam</p>
+            <h1 class="project-title display">The Mystery of the Lost Plot</h1>
+            <p class="project-brief">Sketch-style 2D puzzle-platformer set inside an abandoned, unfinished literary world. A hero restores the missing fragments of the story, one puzzle at a time. Built in a 3-person game jam.</p>
+            <div class="card-tags">
+                <span class="card-tag">Puzzle</span>
+                <span class="card-tag">Platformer</span>
+                <span class="card-tag">2D</span>
+                <span class="card-tag">PC</span>
+                <span class="card-tag">Narrative Design</span>
+                <span class="card-tag">Story-Driven</span>
+                <span class="card-tag">Gameplay Scripting</span>
+            </div>
+            <div class="project-meta-row">
+                <div class="meta-item">
+                    <span class="meta-label">Role</span>
+                    <span class="meta-value">Unity Developer<br>Narrative Designer<br>Game Designer</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Team</span>
+                    <span class="meta-value">3 people</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Engine</span>
+                    <span class="meta-value">Unity 2D</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Platform</span>
+                    <span class="meta-value">PC</span>
+                </div>
+            </div>
+            <div class="hero-btn-group">
+                <a href="#media" class="btn-context">Media ↓</a>
+                <a href="#creative-context" class="btn-context">Creative Context ↓</a>
+                <a href="#contribution" class="btn-context">My Contribution ↓</a>
+            </div>
+        </div>
+
+        <div class="project-hero-image">
+            <img src="projects_previews/mystery_lost_plot_cover.png" alt="The Mystery of the Lost Plot preview">
+        </div>
+
+    </div>
+</section>
+
+<section class="section" id="media">
+    <div class="section-wrap">
+        <h2 class="section-title reveal">Media</h2>
+
+        <div class="media-block reveal">
+            <p class="media-label">Gameplay</p>
+            <div class="video-wrapper">
+                <iframe
+                    src="https://www.youtube.com/embed/vrS0mSAR2cU?rel=0"
+                    title="The Mystery of the Lost Plot Gameplay"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <div class="media-block reveal">
+            <p class="media-label">Screenshots</p>
+            <div class="slides-wrapper">
+                <iframe
+                    src="https://docs.google.com/presentation/d/e/2PACX-1vQxB12iuUvwRoyaq2pxZbfinaEPHN5fSMQz2hlgbJjG_xk-oICj8sD029QQJukK4BiJQ-vmxYKS-ILf/embed?start=false&loop=false&delayms=4000"
+                    title="The Mystery of the Lost Plot Screenshots"
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <p class="notice-text">Note: this prototype is available in Russian only. Some screenshots have been edited to translate text into English using AI or manually in Photoshop.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="context">
+    <div class="section-wrap">
+        <div class="context-grid">
+
+            <div class="reveal">
+                <p class="context-side-label">Project Type</p>
+                <p class="context-heading">A sketch-style 2D puzzle-platformer prototype inspired by the sketchbook level from Split Fiction</p>
+                <div class="context-text">
+                    <p>A Game Jam project created by a team of three. Focused on creativity, narrative structure, and puzzle-based gameplay.</p>
+                    <p>Note: the playable prototype is available in Russian only.</p>
+                </div>
+            </div>
+
+            <div class="reveal" id="creative-context">
+                <p class="context-side-label">Creative Context</p>
+                <div class="context-text">
+                    <p>The story follows a hero who finds themselves inside an abandoned, unfinished literary world. Its plot has fallen apart, and the characters who once lived there have become silent silhouettes, trapped between rough sketches and forgotten ideas.</p>
+                    <p>The hero's goal is to restore the missing fragments of the story, bring meaning back to the world, and inspire the writer to finish their work.</p>
+                    <p>On a deeper level, the game reflects the role of a creative game development team in bringing fictional worlds to life through writing, storytelling, localization, and imagination.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="section" id="contribution">
+    <div class="section-wrap">
+        <h2 class="section-title reveal">My Contribution</h2>
+        <ul class="contribution-list">
+            <li class="reveal">Collaborated with the team to shape the project concept into a playable 2D puzzle-platformer prototype during the Game Jam.</li>
+            <li class="reveal">Implemented the Unity side of the project: scene setup, player interactions, puzzle logic, and event-based progression.</li>
+            <li class="reveal">Designed and built the narrative and dialogue system with dialogue triggers.</li>
+            <li class="reveal">Structured level flow around puzzles, story beats, and player actions.</li>
+            <li class="reveal">Integrated visual assets, UI elements, and gameplay objects into a cohesive sketch-style experience.</li>
+        </ul>
+    </div>
+</section>
+
+<div class="project-nav-section">
+    <div class="project-nav-inner">
+        <a href="project-snake-runner.html" class="btn-ghost">&#8592; Snake Runner for Vikings: War of Clans</a>
+        <a href="project-loperecopik.html" class="btn-ghost">Adventures of Loperecopik &#8594;</a>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-inner">
+        <span class="footer-copy">Alina Martynchik, 2026</span>
+        <span class="footer-copy">Game Scripter</span>
+    </div>
+</footer>
+
+<script>
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                io.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    revealEls.forEach(el => io.observe(el));
+
+    // Mobile nav toggle
+    (function () {
+        const nav = document.getElementById('site-nav');
+        const btn = document.getElementById('nav-hamburger');
+        const menu = document.getElementById('nav-mobile-menu');
+        if (!nav || !btn || !menu) return;
+        function openMenu() {
+            nav.classList.add('nav-open');
+            btn.setAttribute('aria-expanded', 'true');
+            menu.setAttribute('aria-hidden', 'false');
+        }
+        function closeMenu() {
+            nav.classList.remove('nav-open');
+            btn.setAttribute('aria-expanded', 'false');
+            menu.setAttribute('aria-hidden', 'true');
+        }
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            nav.classList.contains('nav-open') ? closeMenu() : openMenu();
+        });
+        menu.querySelectorAll('.nav-mobile-link').forEach(function (link) {
+            link.addEventListener('click', closeMenu);
+        });
+        document.addEventListener('click', function (e) {
+            if (!nav.contains(e.target)) closeMenu();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeMenu();
+        });
+    })();
+</script>
+
+</body>
+</html>
