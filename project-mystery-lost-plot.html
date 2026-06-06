@@ -363,7 +363,7 @@
 
         .media-label {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.6875rem;
+            font-size: 0.8125rem;
             color: var(--gold);
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -388,22 +388,79 @@
             border: none;
         }
 
-        .slides-wrapper {
+        .carousel {
             position: relative;
             width: 100%;
-            padding-bottom: 61.73%;
+            aspect-ratio: 16 / 9;
             background: var(--bg-card);
             border-radius: var(--radius-card);
             overflow: hidden;
             border: 1px solid var(--border-dim);
         }
 
-        .slides-wrapper iframe {
-            position: absolute;
-            inset: 0;
+        .carousel-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .carousel-track img {
+            flex: 0 0 100%;
             width: 100%;
             height: 100%;
-            border: none;
+            object-fit: contain;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(13, 13, 20, 0.75);
+            border: 1px solid var(--border-dim);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, border-color 0.2s;
+            z-index: 2;
+            padding: 0;
+        }
+
+        .carousel-btn:hover { background: var(--accent); border-color: var(--accent); }
+        .carousel-prev { left: 12px; }
+        .carousel-next { right: 12px; }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+            z-index: 2;
+        }
+
+        .carousel-dots .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            opacity: 0.45;
+            cursor: pointer;
+            transition: opacity 0.2s, background 0.2s, transform 0.2s;
+        }
+
+        .carousel-dots .dot.active {
+            opacity: 1;
+            background: var(--accent);
+            transform: scale(1.3);
         }
 
         .media-block {
@@ -425,7 +482,7 @@
 
         .context-side-label {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.6875rem;
+            font-size: 0.8125rem;
             color: var(--gold);
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -639,7 +696,7 @@
             <div class="project-meta-row">
                 <div class="meta-item">
                     <span class="meta-label">Role</span>
-                    <span class="meta-value">Unity Developer<br>Narrative Designer<br>Game Designer</span>
+                    <span class="meta-value">Unity Developer<br>2D Character Artist<br>Narrative Designer<br>Game Designer</span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">Team</span>
@@ -686,12 +743,33 @@
 
         <div class="media-block reveal">
             <p class="media-label">Screenshots</p>
-            <div class="slides-wrapper">
-                <iframe
-                    src="https://docs.google.com/presentation/d/e/2PACX-1vQxB12iuUvwRoyaq2pxZbfinaEPHN5fSMQz2hlgbJjG_xk-oICj8sD029QQJukK4BiJQ-vmxYKS-ILf/embed?start=false&loop=false&delayms=4000"
-                    title="The Mystery of the Lost Plot Screenshots"
-                    allowfullscreen>
-                </iframe>
+            <div class="carousel">
+                <div class="carousel-track">
+                    <img src="images/lost_plot/preview_final.png" alt="Screenshot 1" loading="lazy">
+                    <img src="images/lost_plot/character.png" alt="Screenshot 2" loading="lazy">
+                    <img src="images/lost_plot/3.png" alt="Screenshot 3" loading="lazy">
+                    <img src="images/lost_plot/4.png" alt="Screenshot 4" loading="lazy">
+                    <img src="images/lost_plot/10.png" alt="Screenshot 5" loading="lazy">
+                    <img src="images/lost_plot/1.png" alt="Screenshot 6" loading="lazy">
+                    <img src="images/lost_plot/2_eng.png" alt="Screenshot 7" loading="lazy">
+                    <img src="images/lost_plot/4_.png" alt="Screenshot 8" loading="lazy">
+                    <img src="images/lost_plot/5_eng.png" alt="Screenshot 9" loading="lazy">
+                    <img src="images/lost_plot/6_.png" alt="Screenshot 10" loading="lazy">
+                    <img src="images/lost_plot/7_.png" alt="Screenshot 11" loading="lazy">
+                    <img src="images/lost_plot/14_eng.png" alt="Screenshot 12" loading="lazy">
+                    <img src="images/lost_plot/6.png" alt="Screenshot 13" loading="lazy">
+                    <img src="images/lost_plot/7.png" alt="Screenshot 14" loading="lazy">
+                    <img src="images/lost_plot/controls_eng.png" alt="Controls" loading="lazy">
+                    <img src="images/lost_plot/2.png" alt="Screenshot 15" loading="lazy">
+                    <img src="images/lost_plot/5.png" alt="Screenshot 16" loading="lazy">
+                </div>
+                <button class="carousel-btn carousel-prev" aria-label="Previous slide">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="carousel-btn carousel-next" aria-label="Next slide">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 2L10 7L5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="carousel-dots"></div>
             </div>
             <p class="notice-text">Note: this prototype is available in Russian only. Some screenshots have been edited to translate text into English using AI or manually in Photoshop.</p>
         </div>
@@ -762,6 +840,29 @@
         });
     }, { threshold: 0.1 });
     revealEls.forEach(el => io.observe(el));
+
+    // Screenshot carousel
+    document.querySelectorAll('.carousel').forEach(function(car) {
+        var track = car.querySelector('.carousel-track');
+        var imgs = track.querySelectorAll('img');
+        var dotsWrap = car.querySelector('.carousel-dots');
+        var current = 0;
+        imgs.forEach(function(_, i) {
+            var dot = document.createElement('div');
+            dot.className = 'dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', function() { goTo(i); });
+            dotsWrap.appendChild(dot);
+        });
+        function goTo(n) {
+            current = (n + imgs.length) % imgs.length;
+            track.style.transform = 'translateX(-' + (current * 100) + '%)';
+            dotsWrap.querySelectorAll('.dot').forEach(function(d, i) {
+                d.classList.toggle('active', i === current);
+            });
+        }
+        car.querySelector('.carousel-prev').addEventListener('click', function() { goTo(current - 1); });
+        car.querySelector('.carousel-next').addEventListener('click', function() { goTo(current + 1); });
+    });
 
     // Mobile nav toggle
     (function () {

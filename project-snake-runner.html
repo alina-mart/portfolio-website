@@ -376,7 +376,7 @@
 
         .media-label {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.6875rem;
+            font-size: 0.8125rem;
             color: var(--gold);
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -401,22 +401,79 @@
             border: none;
         }
 
-        .slides-wrapper {
+        .carousel {
             position: relative;
             width: 100%;
-            padding-bottom: 61.73%;
+            aspect-ratio: 16 / 9;
             background: var(--bg-card);
             border-radius: var(--radius-card);
             overflow: hidden;
             border: 1px solid var(--border-dim);
         }
 
-        .slides-wrapper iframe {
-            position: absolute;
-            inset: 0;
+        .carousel-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .carousel-track img {
+            flex: 0 0 100%;
             width: 100%;
             height: 100%;
-            border: none;
+            object-fit: contain;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(13, 13, 20, 0.75);
+            border: 1px solid var(--border-dim);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, border-color 0.2s;
+            z-index: 2;
+            padding: 0;
+        }
+
+        .carousel-btn:hover { background: var(--accent); border-color: var(--accent); }
+        .carousel-prev { left: 12px; }
+        .carousel-next { right: 12px; }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+            z-index: 2;
+        }
+
+        .carousel-dots .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            opacity: 0.45;
+            cursor: pointer;
+            transition: opacity 0.2s, background 0.2s, transform 0.2s;
+        }
+
+        .carousel-dots .dot.active {
+            opacity: 1;
+            background: var(--accent);
+            transform: scale(1.3);
         }
 
         .media-block {
@@ -440,7 +497,7 @@
 
         .context-side-label {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.6875rem;
+            font-size: 0.8125rem;
             color: var(--gold);
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -582,9 +639,16 @@
 
         .hero-btn-group {
             display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .hero-btn-anchors {
+            display: flex;
             flex-wrap: wrap;
             gap: 0.625rem;
-            margin-top: 1.25rem;
         }
 
         .btn-context {
@@ -606,6 +670,29 @@
             border-color: var(--accent);
             transform: translateY(-1px);
         }
+
+        .btn-play {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #fff;
+            background: var(--accent);
+            padding: 0.6rem 1.375rem;
+            border-radius: var(--radius-btn);
+            text-decoration: none;
+            border: 1px solid transparent;
+            box-shadow: 0 0 18px rgba(124,58,237,0.35);
+            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+            letter-spacing: 0.02em;
+        }
+        .btn-play:hover {
+            background: var(--accent-light);
+            box-shadow: 0 0 28px rgba(124,58,237,0.55);
+            transform: translateY(-1px);
+        }
+        .btn-play:active { transform: translateY(0); }
 
         #media, #creative-context, #contribution {
             scroll-margin-top: 88px;
@@ -677,9 +764,15 @@
                 </div>
             </div>
             <div class="hero-btn-group">
-                <a href="#media" class="btn-context">Media ↓</a>
-                <a href="#creative-context" class="btn-context">Creative Context ↓</a>
-                <a href="#contribution" class="btn-context">My Contribution ↓</a>
+                <a href="https://vikings-mini-game.plarium.com/" class="btn-play" target="_blank" rel="noopener noreferrer">
+                    <svg width="13" height="14" viewBox="0 0 13 14" fill="none" aria-hidden="true"><path d="M2 1.5L11 7L2 12.5V1.5Z" fill="currentColor"/></svg>
+                    Play Snake Runner
+                </a>
+                <div class="hero-btn-anchors">
+                    <a href="#media" class="btn-context">Media ↓</a>
+                    <a href="#creative-context" class="btn-context">Creative Context ↓</a>
+                    <a href="#contribution" class="btn-context">My Contribution ↓</a>
+                </div>
             </div>
         </div>
 
@@ -710,12 +803,21 @@
 
         <div class="media-block reveal">
             <p class="media-label">Screenshots</p>
-            <div class="slides-wrapper">
-                <iframe
-                    src="https://docs.google.com/presentation/d/e/2PACX-1vRdoxnSacFXAxS_we3ZOu61AlYuXyjJmnVu6lZJvvSSv-IcmeKupc0vYamql-L-6sv0v2bLWzaS609b/embed?start=false&loop=false&delayms=4000"
-                    title="Snake Runner Screenshots"
-                    allowfullscreen>
-                </iframe>
+            <div class="carousel">
+                <div class="carousel-track">
+                    <img src="images/snake_runner/visuals_copywrite.png" alt="Screenshot 1" loading="lazy">
+                    <img src="images/snake_runner/animation_copywrite.png" alt="Screenshot 2" loading="lazy">
+                    <img src="images/snake_runner/interface_copywrite.png" alt="Screenshot 3" loading="lazy">
+                    <img src="images/snake_runner/screenshot_1_copywrite.png" alt="Screenshot 4" loading="lazy">
+                    <img src="images/snake_runner/screenshot_2_copywrite.png" alt="Screenshot 5" loading="lazy">
+                </div>
+                <button class="carousel-btn carousel-prev" aria-label="Previous slide">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="carousel-btn carousel-next" aria-label="Next slide">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 2L10 7L5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="carousel-dots"></div>
             </div>
         </div>
     </div>
@@ -787,6 +889,29 @@
         });
     }, { threshold: 0.1 });
     revealEls.forEach(el => io.observe(el));
+
+    // Screenshot carousel
+    document.querySelectorAll('.carousel').forEach(function(car) {
+        var track = car.querySelector('.carousel-track');
+        var imgs = track.querySelectorAll('img');
+        var dotsWrap = car.querySelector('.carousel-dots');
+        var current = 0;
+        imgs.forEach(function(_, i) {
+            var dot = document.createElement('div');
+            dot.className = 'dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', function() { goTo(i); });
+            dotsWrap.appendChild(dot);
+        });
+        function goTo(n) {
+            current = (n + imgs.length) % imgs.length;
+            track.style.transform = 'translateX(-' + (current * 100) + '%)';
+            dotsWrap.querySelectorAll('.dot').forEach(function(d, i) {
+                d.classList.toggle('active', i === current);
+            });
+        }
+        car.querySelector('.carousel-prev').addEventListener('click', function() { goTo(current - 1); });
+        car.querySelector('.carousel-next').addEventListener('click', function() { goTo(current + 1); });
+    });
 
     // Mobile nav toggle
     (function () {
