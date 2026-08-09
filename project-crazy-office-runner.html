@@ -643,6 +643,12 @@
             margin-top: 1.25rem;
         }
 
+        .hero-btn-anchors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.625rem;
+        }
+
         .btn-context {
             display: inline-flex;
             align-items: center;
@@ -662,6 +668,29 @@
             border-color: var(--accent);
             transform: translateY(-1px);
         }
+
+        .btn-play {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #fff;
+            background: var(--accent);
+            padding: 0.6rem 1.375rem;
+            border-radius: var(--radius-btn);
+            text-decoration: none;
+            border: 1px solid transparent;
+            box-shadow: 0 0 18px rgba(124,58,237,0.35);
+            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+            letter-spacing: 0.02em;
+        }
+        .btn-play:hover {
+            background: var(--accent-light);
+            box-shadow: 0 0 28px rgba(124,58,237,0.55);
+            transform: translateY(-1px);
+        }
+        .btn-play:active { transform: translateY(0); }
 
         #media, #creative-context, #contribution {
             scroll-margin-top: 88px;
@@ -734,9 +763,15 @@
                 </div>
             </div>
             <div class="hero-btn-group">
-                <a href="#media" class="btn-context">Media ↓</a>
-                <a href="#creative-context" class="btn-context">Creative Context ↓</a>
-                <a href="#contribution" class="btn-context">My Contribution ↓</a>
+                <a href="https://yandex.ru/games/app/522409?draft=true&lang=en" class="btn-play" target="_blank" rel="noopener noreferrer">
+                    <svg width="13" height="14" viewBox="0 0 13 14" fill="none" aria-hidden="true"><path d="M2 1.5L11 7L2 12.5V1.5Z" fill="currentColor"/></svg>
+                    Play Pre-Release Build
+                </a>
+                <div class="hero-btn-anchors">
+                    <a href="#media" class="btn-context">Media ↓</a>
+                    <a href="#creative-context" class="btn-context">Creative Context ↓</a>
+                    <a href="#contribution" class="btn-context">My Contribution ↓</a>
+                </div>
             </div>
         </div>
 
